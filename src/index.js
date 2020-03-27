@@ -16,3 +16,5 @@ const port = 4000;
 server.listen({ port: process.env.PORT || port }).then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
 });
+
+// 배포 테스트
