@@ -1,19 +1,32 @@
-import { gql } from 'apollo-server';
+import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
-  type Movie {
+  type User {
     id: Int!
     name: String!
-    rating: Int!
+    email: String!
+    password: String!
+    birthday: String!
+    gender: String!
+    job: String!
+  }
+
+  type Board {
+    board_id: Int!
+    title: String!
+    content: String!
+    email: String!
+    date: String!
+    hit: Int!
   }
 
   type Query {
-    movies: [Movie!]!
-    movie(id: Int!): Movie
+    users: [User!]!
+    user(email: String!): User
   }
 
   type Mutation {
-    addMovie(name: String!, rating: Int!): Movie!
+    register(name: String!,email:String!, password: String!,  birthday: String!, gender: String!, job: String!): User!
   }
 `;
 

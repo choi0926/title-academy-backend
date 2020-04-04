@@ -1,25 +1,29 @@
-import movies from '../database/movies';
+import users from '../database/users';
 
 const resolvers = {
   Query: {
-    movies: () => movies,
-    movie: (_, { id }) => {
-      return movies.filter(movie => movie.id === id)[0];
+    users: () => users,
+    user: (_, { email }) => {
+      return users.filter(user => user.email === email)[0];
     }
   },
   Mutation: {
-    addMovie: (_, { name, rating }) => {
+    register: (_, { name, email,password,birthday,gender,job }) => {
       // 영화 제목 중복 검사
-      if (movies.find(movie => movie.name === name)) return null;
+      if (users.find(user => user.email === email)) return null;
       
       // 데이터베이스에 추가
-      const newMovie = {
-        id: movies.length + 1,
+      const newUser = {
+        id: users.length + 1,
         name,
-        rating
+        email,
+        password,
+        birthday,
+        gender,
+        job
       };
-      movies.push(newMovie);
-      return newMovie;
+      users.push(newUser);
+      return newUser;
     }
   }
 };
