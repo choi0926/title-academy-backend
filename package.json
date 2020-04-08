@@ -17,8 +17,18 @@
   },
   "dependencies": {
     "apollo-server": "^2.11.0",
+    "apollo-server-express": "^2.11.0",
+    "bcrypt": "^4.0.1",
+    "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
-    "graphql": "^14.6.0"
+    "express": "^4.17.1",
+    "graphql": "^14.6.0",
+    "helmet": "^3.22.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.1.0",
+    "sequelize": "^5.21.6",
+    "sequelize-cli": "^5.5.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -26,6 +36,7 @@
     "@babel/node": "^7.8.7",
     "@babel/polyfill": "^7.8.7",
     "@babel/preset-env": "^7.9.0",
+    "eslint": "^6.8.0",
     "nodemon": "^2.0.2"
   }
 }
