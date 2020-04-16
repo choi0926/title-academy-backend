@@ -1,21 +1,27 @@
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
+import express from 'express';
 import resolvers from './graphql/resolvers';
 import typeDefs from './graphql/typeDefs';
-import { config } from 'dotenv';
+import dotenv from 'dotenv';
+import db from '../models';
+import cors from 'cors'
 
-config();
+
+const app = express();
+dotenv.config();
+db.sequelize.sync();
 
 // ApolloServer는 스키마와 리졸버가 반드시 필요함
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  introspection: true,
-  playground: true,
+  context: ({ req, res }) => ({req, res, db}),
+  
 });
+
+server.applyMiddleware({ app, path: '/' });
 const port = 4000;
 // listen 함수로 웹 서버 실행
-server.listen({ port: process.env.PORT || port }).then(({ url }) => {
-    console.log(`🚀  Server ready at ${url}`);
-  });
-
-// 배포 테스트
+app.listen({ port: process.env.PORT || port }, () => {
+  console.log(`🚀  Server ready at localhost:${port}`);
+});
