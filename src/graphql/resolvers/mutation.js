@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ValidationError, ForbiddenError } from 'apollo-server';
 
-export const Mutation = {
+const Mutation = {
   async addUser(parents, { email, nickname, password }, { res, req, db }) {
     try {
       const users = await db.User.findOne({ where: { email } });
@@ -38,3 +38,5 @@ export const Mutation = {
     }
   },
 };
+
+export default Mutation;

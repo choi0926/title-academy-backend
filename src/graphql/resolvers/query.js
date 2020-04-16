@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ForbiddenError } from 'apollo-server';
 
-export const Query = {
+const Query = {
   users: (parents, args, { db }) => {
     const users = db.User.findAll();
     return users;
@@ -35,4 +35,20 @@ export const Query = {
       throw new ForbiddenError('로그인에 실패하셨습니다..');
     }
   },
+  logout(parents,args, { req, res, db }){
+    try{
+      const token = req.headers.auth;
+      if (!token) {
+        throw new ForbiddenError('not token');
+      }
+      res.cookie('auth','')
+      return 'success';
+
+    }catch(error){
+      throw new Error(error);
+
+    }
+  }
 };
+
+export default Query;
