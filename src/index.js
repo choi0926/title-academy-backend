@@ -3,7 +3,7 @@ import express from 'express';
 import resolvers from './graphql/resolvers';
 import typeDefs from './graphql/schema';
 import dotenv from 'dotenv';
-import db from '../models';
+import db from './models';
 
 const app = express();
 dotenv.config();
@@ -13,6 +13,8 @@ db.sequelize.sync();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  introspection: true,
+  playground: true,
   context: ({ req, res }) => ({req, res, db})
 });
 
