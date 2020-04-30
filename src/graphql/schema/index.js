@@ -8,8 +8,6 @@ const common = gql`
   type Query {
     users: [User!]!
     user(email: String!): User
-    login(email: String!, password: String!): User
-    logout: String!
     posts: [Post!]!
     post(UserId: Int!): [Post]
     postInfo(PostId: Int!): [Post]
@@ -19,6 +17,9 @@ const common = gql`
   }
   type Mutation {
     addUser(email: String!, nickname: String!, password: String!): User!
+    login(email: String!, password: String!): LoginUser
+    logout: Boolean!
+    tokenReissue(accessToken:String!,refreshToken:String!): String!
     updateUser(nickname: String, password: String, description: String, profile: String): User!
     addPost(category: String!, subject: String!, content: String, src: String): Post!
     protectedAction: String

@@ -1,40 +1,78 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { ValidationError, ForbiddenError } from 'apollo-server';
+import dotenv from 'dotenv';
+import db from '../../models';
+import redis from 'redis';
+import JWTR from 'jwt-redis';
+const redisClient = redis.createClient();
+const jwtr = new JWTR(redisClient);
+dotenv.config();
 
 const Mutation = {
-  async addUser(parents, { email, nickname, password }, { res, req, db }) {
+  async addUser(parents, { email, nickname, password }) {
     try {
       const users = await db.User.findOne({ where: { email } });
       if (users) {
-        throw new ValidationError('이미사용중인 이메일 주소입니다.');
+        throw new Error('That email has already been registered.');
       }
-
       const hashpass = await bcrypt.hash(password, 10);
       const addUser = await db.User.create({ email, nickname, password: hashpass });
       return addUser;
     } catch (error) {
-      throw new ForbiddenError('회원가입을 실패하였습니다.');
+      throw new Error(error);
     }
   },
-  async updateUser(parents, { nickname, password, description, profile }, { res, req, db }) {
+
+  async login(parents, { email, password }) {
     try {
-      const token = req.headers.auth;
-      if (!token) {
-        throw new ForbiddenError('not token');
+      let users = await db.User.findOne({ where: { email } });
+      if (!users) {
+        throw new Error('Please check your email.');
       }
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      if (!decoded) {
-        throw new ForbiddenError('not decode');
+      const hashpass = await bcrypt.compare(password, users.password);
+      if (!hashpass) {
+        throw new Error('Please check your password.');
       }
-      const user = await db.User.findOne({ where: { email: decoded.email } });
-      const hashpass = await bcrypt.hash(password, 10);
-
-      await db.User.update({ nickname, password: hashpass, description, profile }, { where: { email: user.email } });
-
-      return user;
-    } catch (error) {
-      throw new Error(error);
+      const payload = { email };
+      const accessToken = await jwtr.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+      const refreshToken = await jwtr.sign(payload, process.env.REFRESH_TOKEN_SECRET);
+      await db.User.update({ refreshToken }, { where: { id: users.id } });
+      return {
+        user: users,
+        accessToken,
+        refreshToken,
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
+  },
+  async logout(parents, args, context) {
+    try {
+      await jwtr.destroy(context.AccessTokenVerifyJti, process.env.ACCESS_TOKEN_SECRET);
+      const me = await db.User.findOne({ where: { id: context.user.id } });
+      const refreshTokenDecoded = await jwtr.verify(me.refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      if (!refreshTokenDecoded) {
+        throw new Error('Invalid token : logout error');
+      }
+      await jwtr.destroy(refreshTokenDecoded.jti, process.env.REFRESH_TOKEN_SECRET);
+      await db.User.update({ refreshToken: '' }, { where: { id: me.id } });
+      return true;
+    } catch (err) {
+      throw new Error(err);
+    }
+  },
+  async tokenReissue(parents, { accessToken, refreshToken }) {
+    try {
+      const accessTokenDecoded = await jwtr.decode(accessToken);
+      const me = await db.User.findOne({ where: { email: accessTokenDecoded.email } });
+      const meRefreshToken = me.refreshToken;
+      if (meRefreshToken !== refreshToken) {
+        throw new Error('Invalid token');
+      }
+      const payload = { email: me.email };
+      const accessTokenReissue = await jwtr.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+      return accessTokenReissue;
+    } catch (err) {
+      throw new Error(err);
     }
   },
 };

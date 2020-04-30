@@ -9,6 +9,11 @@ const user = gql`
     description: String
     profile: String
   }
+  type LoginUser {
+    user:User!
+    accessToken:String!
+    refreshToken:String!
+  }
 `;
 
 export default user;

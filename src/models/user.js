@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       profile: {
         type: DataTypes.STRING(200),
         allowNull: true,
+      },
+      refreshToken: {
+        type: DataTypes.TEXT,
+        allowNull: true,
         tableName: 'user'
       },
     },

@@ -4,6 +4,7 @@ import resolvers from './graphql/resolvers';
 import typeDefs from './graphql/schema';
 import dotenv from 'dotenv';
 import db from './models';
+import { context } from './middleware/auth'
 
 const app = express();
 dotenv.config();
@@ -15,10 +16,9 @@ const server = new ApolloServer({
   resolvers,
   introspection: true,
   playground: true,
-  context: ({ req, res }) => ({req, res, db})
+  context
 });
-
-server.applyMiddleware({ app, path: '/' });
+server.applyMiddleware({ app, path: '/graphql' });
 const port = 4000;
 
 // listen 함수로 웹 서버 실행
