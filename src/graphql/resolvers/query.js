@@ -1,23 +1,21 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { ForbiddenError } from 'apollo-server';
+import db from '../../models'
 
 const Query = {
   // 모든 사용자 리스트
-  users: (parents, args, { db }) => {  
+  users: (parents, args) => {  
     const users = db.User.findAll();
     return users;
   },
   // 특정 사용자 정보
-  async user(parents, { email }, { req, res, db }) { 
+  async user(parents, { email }) { 
     try {
       const users = await db.User.findOne({ where: { email } });
       if (!users) {
-        res.status(403).send('사용자를 찾을 수 없습니다.');
+        throw new Error('User not found.');
       }
       return users;
-    } catch (error) {
-      throw new ForbiddenError('사용자를 찾을 수 없습니다.');
+    } catch (err) {
+      return err;
     }
   },
 };
