@@ -21,6 +21,6 @@ export const context = async ({ req }) => {
       return 'No auth token';
     }
   } catch (err) {
-    throw new Error(err);
+    return err;
   }
 };

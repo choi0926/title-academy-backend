@@ -5,6 +5,7 @@ import typeDefs from './graphql/schema';
 import dotenv from 'dotenv';
 import db from './models';
 import { context } from './middleware/auth'
+import cors from 'cors'
 
 const app = express();
 dotenv.config();
@@ -18,6 +19,14 @@ const server = new ApolloServer({
   playground: true,
   context
 });
+
+app.use(
+  cors({
+    origin: true, 
+    credentials: true,
+  })
+);
+
 server.applyMiddleware({ app, path: '/graphql' });
 const port = 4000;
 

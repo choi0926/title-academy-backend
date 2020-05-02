@@ -14,12 +14,15 @@ const common = gql`
     comments(PostId: Int!): [Comment]
     comment(UserId: Int!): [Comment]
     image(PostId: Int!): [Image]
+    forgotPassword(email:String!):String!
+    authCode(authCode:String!):User!
   }
   type Mutation {
     addUser(email: String!, nickname: String!, password: String!): User!
     login(email: String!, password: String!): LoginUser
-    logout: Boolean!
+    logout: String!
     tokenReissue(accessToken:String!,refreshToken:String!): String!
+    userInfoModifed(email: String!, password: String!):String!
   }
 `;
 

@@ -26,8 +26,12 @@ module.exports = (sequelize, DataTypes) => {
       refreshToken: {
         type: DataTypes.TEXT,
         allowNull: true,
-        tableName: 'user'
       },
+      authCode:{
+        type: DataTypes.STRING(200),
+        allowNull: true,
+        tableName: 'user',
+      }
     },
     {
       charset: 'utf8',
