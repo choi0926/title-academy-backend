@@ -8,12 +8,8 @@ const common = gql`
   type Query {
     users: [User!]!
     user(email: String!): User
-    posts: [Post!]!
-    post(UserId: Int!): [Post]
-    postInfo(PostId: Int!): [Post]
-    comments(PostId: Int!): [Comment]
-    comment(UserId: Int!): [Comment]
-    image(PostId: Int!): [Image]
+    posts: [Post!]
+    post(PostId: Int!): Post
     forgotPassword(email:String!):String!
     authCode(authCode:String!):User!
   }
@@ -23,6 +19,7 @@ const common = gql`
     logout: String!
     tokenReissue(accessToken:String!,refreshToken:String!): String!
     userInfoModifed(email: String!, password: String!):String!
+    addPost(category: String!, subject: String!,content: String!,image:[String]):PostInfo!
   }
 `;
 

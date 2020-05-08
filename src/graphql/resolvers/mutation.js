@@ -76,19 +76,38 @@ const Mutation = {
       return err;
     }
   },
-  async userInfoModifed(parents,{email, password}){
-    try{
-      const user = await db.User.findOne({where:{email}});
-      if(!user){
+  async userInfoModifed(parents, { email, password }) {
+    try {
+      const user = await db.User.findOne({ where: { email } });
+      if (!user) {
         throw new Error('The user does not exist.');
       }
       const hashpass = await bcrypt.hash(password, 10);
-      await db.User.update({password:hashpass},{where:{email:user.email}});
+      await db.User.update({ password: hashpass }, { where: { email: user.email } });
       return 'Your password has been modified.';
-    }catch(err){
+    } catch (err) {
       return err;
     }
-  }
+  },
+  async addPost(parents, { category, subject, content, image }, context) {
+    try {
+      const addPost = await db.Post.create({ category, subject, content, UserId: context.user.id });
+      if (image) {
+        if (Array.isArray(image)) {
+          const getImages = await Promise.all(
+            image.map((image) => {
+              return db.Image.create({ src: image, UserId: context.user.id, PostId: addPost.id });
+            }),
+          );
+          await addPost.addImages(getImages);
+        }
+      }
+      const getImageInfo = await db.Image.findAll({ where: { PostId: addPost.id } });
+      return { post: addPost, image: getImageInfo };
+    } catch (err) {
+      return err;
+    }
+  },
 };
 
 export default Mutation;
