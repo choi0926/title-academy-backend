@@ -1,7 +1,6 @@
 import { gql } from 'apollo-server-express';
 
 const post = gql`
-
   type Post {
     category: String!
     subject: String!
@@ -29,7 +28,14 @@ const post = gql`
   }
   type PostInfo{
     post:Post!
-    image:[Image]
+    image:Image!
+    comment:Comment!
+  }
+  
+  type File{
+    filename:String!
+    mimetype:String!
+    encoding:String!
   }
 `;
 

@@ -3,6 +3,16 @@ import dotenv from 'dotenv';
 import db from '../../models';
 import redis from 'redis';
 import JWTR from 'jwt-redis';
+import AWS from 'aws-sdk';
+import moment from 'moment';
+
+AWS.config.update({
+  region: 'ap-northeast-2',
+  accessKeyId: process.env.S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+});
+
+const s3 = new AWS.S3({ apiVersion: '2012-10-17' });
 
 const redisClient = redis.createClient(process.env.REDIS_URL);
 const jwtr = new JWTR(redisClient);
@@ -89,21 +99,45 @@ const Mutation = {
       return err;
     }
   },
-  async addPost(parents, { category, subject, content, image }, context) {
+  // async addPost(parents, { category, subject, content, image }, context) {
+  async addPost(parents, { category, subject, content, file }, context) {
     try {
       const addPost = await db.Post.create({ category, subject, content, UserId: context.user.id });
-      if (image) {
-        if (Array.isArray(image)) {
-          const getImages = await Promise.all(
-            image.map((image) => {
-              return db.Image.create({ src: image, UserId: context.user.id, PostId: addPost.id });
-            }),
-          );
-          await addPost.addImages(getImages);
-        }
-      }
-      const getImageInfo = await db.Image.findAll({ where: { PostId: addPost.id } });
-      return { post: addPost, image: getImageInfo };
+      const { createReadStream, filename, mimetype } = await file;
+      const fileStream = createReadStream();
+
+      const Date = moment().format('YYYYMMDD');
+      const randomString = Math.random().toString(36).substring(2, 7);
+      const uploadParams = {
+        Bucket: 'title-academy',
+        Key: `post/${Date}_${randomString}_${filename}`,
+        Body: fileStream,
+        ContentType: mimetype,
+      };
+      const result = await s3.upload(uploadParams).promise();
+      console.log(result.Location);
+      await db.Image.create({ src: result.Location, UserId: context.user.id, PostId: addPost.id });
+      console.log(result);
+
+      // if (Array.isArray(image)) {
+      //   const getImages = await Promise.all(
+      //     image.map((image) => {
+      //       return db.Image.create({ src: image, UserId: context.user.id, PostId: addPost.id });
+      //     }),
+      //   );
+      //   await addPost.addImages(getImages);
+      // }
+      // const getImageInfo = await db.Image.findAll({ where: { PostId: addPost.id } });
+      // const getComment = await db.Comment.findAll({ where: { PostId: addPost.id } });
+      return 'Successful post creation.';
+    } catch (err) {
+      return err;
+    }
+  },
+  async addComment(parents, { PostId, content }, context) {
+    try {
+      const addComment = await db.Comment.create({ content, UserId: context.user.id, PostId });
+      return addComment;
     } catch (err) {
       return err;
     }

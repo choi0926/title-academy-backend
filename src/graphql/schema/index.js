@@ -8,10 +8,12 @@ const common = gql`
   type Query {
     users: [User!]!
     user(email: String!): User
-    posts: [Post!]
-    post(PostId: Int!): Post
     forgotPassword(email:String!):String!
     authCode(authCode:String!):User!
+    posts: [Post]!
+    post(PostId: Int!): Post!
+    comment(PostId:Int!):[Comment]!
+    image(PostId:Int!):[Image]!
   }
   type Mutation {
     addUser(email: String!, nickname: String!, password: String!): User!
@@ -19,7 +21,8 @@ const common = gql`
     logout: String!
     tokenReissue(accessToken:String!,refreshToken:String!): String!
     userInfoModifed(email: String!, password: String!):String!
-    addPost(category: String!, subject: String!,content: String!,image:[String]):PostInfo!
+    addPost(category:String!,subject:String!,content:String!,file:Upload):String!
+    addComment(PostId:Int!,content:String!):Comment!
   }
 `;
 
