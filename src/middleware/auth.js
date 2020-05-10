@@ -8,7 +8,7 @@ dotenv.config();
 
 export const context = async ({ req }) => {
   try {
-    const accessToken = req.headers.authorization || '';
+    const accessToken = req.headers.authorization.split(" ")[1] || '';
     if (accessToken) {
       const accessTokenVerifed = await jwtr.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
       const user = await db.User.findOne({ where: { email: accessTokenVerifed.email } });
