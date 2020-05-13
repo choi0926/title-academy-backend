@@ -1,9 +1,7 @@
-import db, { Comment } from '../../models';
+import db from '../../models';
 import { sendMail } from '../../middleware/mailsender';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import { promises } from 'dns';
-import post from '../schema/post';
 dotenv.config();
 
 const Query = {
@@ -52,6 +50,7 @@ const Query = {
 
   async posts(parents, args) {
     try {
+      //TODO: 페이징, 유저정보 포함,  display, page 인자값, 최신순으로
       const getPost = await db.Post.findAll();
       return getPost;
     } catch (err) {
@@ -69,7 +68,7 @@ const Query = {
       return err;
     }
   },
-  async comment(parents, { PostId }) {
+  async comments(parents, { PostId }) {
     try {
       const getComment = await db.Comment.findAll({where:{PostId}});
       return getComment;

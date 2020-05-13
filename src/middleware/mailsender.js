@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const sendMail = async (to, subject, authCode) => {
-  const googleTransport = await nodemailer.createTransport({
+  const googleTransport = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
@@ -21,9 +21,9 @@ export const sendMail = async (to, subject, authCode) => {
       from: process.env.GOOLE_USER,
       to,
       subject,
-      html: `
-      <p>Please click on the following link</p>
-       <p><a href>http://ec2-15-165-191-71.ap-northeast-2.compute.amazonaws.com/verify/${authCode}</a></p>`,
+      //TODO:html 문구수정(도메인 주소 수정)
+      html: `<p>Please click on the following link</p>
+       <p><a href="http://ec2-15-165-191-71.ap-northeast-2.compute.amazonaws.com/verify/${authCode}">http://ec2-15-165-191-71.ap-northeast-2.compute.amazonaws.com/verify/${authCode}</a></p>`,
     };
 
   try {
