@@ -105,35 +105,20 @@ const Mutation = {
       if (files) {
         files.map(async (ok) => {
           const { createReadStream, filename, mimetype } = await ok;
-          console.log(filename);
-
           const fileStream = createReadStream();
-          console.log(fileStream);
           const Date = moment().format('YYYYMMDD');
           const randomString = Math.random().toString(36).substring(2, 7);
           const uploadParams = {
             Bucket: 'title-academy',
-            Key: `post/${Date}_${randomString}_${filename}`,
+            Key: `original/post/${Date}_${randomString}_${filename}`,
             Body: fileStream,
             ContentType: mimetype,
           };
-          console.log(uploadParams);
           const result = await s3.upload(uploadParams).promise();
-          console.log(result.Location);
           await db.Image.create({ src: result.Location, UserId: context.user.id, PostId: addPost.id });
           console.log(result);
         });
       }
-      // if (Array.isArray(image)) {
-      //   const getImages = await Promise.all(
-      //     image.map((image) => {
-      //       return db.Image.create({ src: image, UserId: context.user.id, PostId: addPost.id });
-      //     }),
-      //   );
-      //   await addPost.addImages(getImages);
-      // }
-      // const getImageInfo = await db.Image.findAll({ where: { PostId: addPost.id } });
-      // const getComment = await db.Comment.findAll({ where: { PostId: addPost.id } });
       return 'Successful post creation.';
     } catch (err) {
       return err;

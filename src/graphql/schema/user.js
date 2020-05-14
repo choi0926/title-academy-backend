@@ -4,14 +4,14 @@ const user = gql`
   type User {
     email: String!
     nickname: String!
-    password: String!
     description: String
     profile: String
   }
+  
   type LoginUser {
-    user:User!
-    accessToken:String!
-    refreshToken:String!
+    user: User!
+    accessToken: String!
+    refreshToken: String!
   }
 `;
 

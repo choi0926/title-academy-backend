@@ -2,6 +2,7 @@ import { gql } from 'apollo-server-express';
 
 const post = gql`
   type Post {
+    id: Int!
     category: String!
     subject: String!
     content: String!
@@ -21,21 +22,29 @@ const post = gql`
   }
 
   type Image {
+    PostId: Int!
     UserId: Int!
     src: String!
     createdAt: DATE!
     updatedAt: DATE!
   }
-  type PostInfo{
-    post:Post!
-    image:Image!
-    comment:Comment!
+  
+  type PostThumbnail {
+    category: String!
+    subject: String!
+    content: String!
+    createdAt: DATE!
+    updatedAt: DATE!
+    recommend: Int!
+    views: Int!
+    UserId: Int!
+    nickname: String!
   }
   
-  type File{
-    filename:String!
-    mimetype:String!
-    encoding:String!
+  type File {
+    filename: String!
+    mimetype: String!
+    encoding: String!
   }
 `;
 
