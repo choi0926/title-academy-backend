@@ -30,7 +30,8 @@ const Query = {
       }
       crypto.randomBytes(64, (err, buf) => {
         crypto.pbkdf2(user.email, buf+process.env.AUTH_SECRET, 100000, 64, 'sha512', async (err, key) => {
-          const authCode = key.toString('base64').replace(/\//g, '');
+          const regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/gi;
+          const authCode = key.toString('base64').replace(regExp, '');
           await db.User.update({ authCode }, { where: { email: user.email } });
           sendMail(user.email, 'Your titleacademy password reset', authCode);
         });

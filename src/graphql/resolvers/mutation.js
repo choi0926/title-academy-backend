@@ -93,7 +93,7 @@ const Mutation = {
         throw new Error('The user does not exist.');
       }
       const hashpass = await bcrypt.hash(password, 10);
-      await db.User.update({ password: hashpass }, { where: { email: user.email } });
+      await db.User.update({ password: hashpass,authCode:"" }, { where: { email: user.email } });
       return 'Your password has been modified.';
     } catch (err) {
       return err;
@@ -110,7 +110,7 @@ const Mutation = {
           const randomString = Math.random().toString(36).substring(2, 7);
           const uploadParams = {
             Bucket: 'title-academy',
-            Key: `original/post/${Date}_${randomString}_${filename}`,
+            Key: `original/${Date}_${randomString}_${filename}`,
             Body: fileStream,
             ContentType: mimetype,
           };

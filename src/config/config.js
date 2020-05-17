@@ -6,7 +6,7 @@ module.exports = {
     username: 'root',
     password: process.env.DB_PASSWORD,
     database: 'graphql-server',
-    host: 'localhost',
+    host: process.env.DB_HOST,
     dialect: 'mysql',
     operatorsAliases: false,
     timezone: "+09:00",

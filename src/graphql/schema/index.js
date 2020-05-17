@@ -19,6 +19,7 @@ const common = gql`
     post(PostId: Int!): PostInfo!
     comments(PostId: Int!): [Comment]!
     image(PostId: Int!): [Image]!
+    searchPost(searchWord: String!): [PostThumbnail]!
   }
   
   type Mutation {
