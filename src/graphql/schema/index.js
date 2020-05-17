@@ -30,6 +30,8 @@ const common = gql`
     userInfoModifed(email: String!, password: String!): String!
     addPost(category: String!, subject: String!, content: String!, files: [Upload]): String!
     addComment(PostId: Int!, content: String!): Comment!
+    postModifed(PostId: Int!,category: String, subject: String, content: String, files: [Upload]): String!
+    postDeleted(PostId: Int!):String!
   }
 `;
 

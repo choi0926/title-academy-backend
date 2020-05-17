@@ -132,6 +132,56 @@ const Mutation = {
       return err;
     }
   },
+  async postModifed(parents,{PostId, category, subject, content, files},context){
+    try {
+      const modifiedRight = await db.Post.findOne({
+        where: {
+          UserId: context.user.id,
+          id:PostId
+        }
+      })
+      if (!modifiedRight) {
+        throw new Error('You can only modify your own posts.')
+      }
+      //
+      const postModified = await db.Post.update({ category, subject, content },{where: { id: PostId }});
+      if (files) {
+        files.map(async (ok) => {
+          const { createReadStream, filename, mimetype } = await ok;
+          const fileStream = createReadStream();
+          const Date = moment().format('YYYYMMDD');
+          const randomString = Math.random().toString(36).substring(2, 7);
+          const uploadParams = {
+            Bucket: 'title-academy',
+            Key: `original/${Date}_${randomString}_${filename}`,
+            Body: fileStream,
+            ContentType: mimetype,
+          };
+          const result = await s3.upload(uploadParams).promise();
+          await db.Image.destroy({where:{PostId}});
+          await db.Image.create({ src: result.Location, UserId: context.user.id, PostId});
+          console.log(result);
+        });
+      }
+      return 'ok'
+    } catch (err) {
+      return err;
+    }
+  },
+  async postDeleted(parents,{PostId},context){
+    try{
+      const deletedRight = await db.Post.findOne({where:{UserId:context.user.id,id:PostId}})
+      if(!deletedRight){
+        throw new Error('You can delete only your own posts.');
+      }
+      await db.Image.destroy({where:{PostId}});
+      await db.Post.destroy({where:{id:PostId}});
+      return 'ok';
+    }catch(err){
+      return err;
+      
+    }
+  }
 };
 
 export default Mutation;

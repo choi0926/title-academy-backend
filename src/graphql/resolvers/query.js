@@ -3,7 +3,6 @@ import { sendMail } from '../../middleware/mailsender';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { QueryTypes } from 'sequelize';
-import { isType } from 'graphql';
 dotenv.config();
 
 const Query = {
@@ -92,6 +91,15 @@ const Query = {
       return err;
     }
   },
+  async searchPost(parents,{searchWord}){
+    try{
+      const post = await sequelize.query(`SELECT Posts.*,Users.email FROM Posts, Users WHERE Posts.UserId = Users.id AND ((Posts.subject LIKE '%${searchWord}%') OR (Posts.content LIKE '%${searchWord}%')) ORDER BY Posts.id DESC`,{type:QueryTypes.SELECT})
+      console.log(post)
+      return post;
+    }catch(err){
+      return err;
+    }
+  }
 };
 
 export default Query;
