@@ -28,6 +28,7 @@ const common = gql`
     logout: String!
     tokenReissue(accessToken: String!, refreshToken: String!): String!
     userInfoModifed(email: String!, password: String!): String!
+    userWithdrawal:String!
     addPost(category: String!, subject: String!, content: String!, files: [Upload]): String!
     addComment(PostId: Int!, content: String!): Comment!
     postModifed(PostId: Int!,category: String, subject: String, content: String, files: [Upload]): String!

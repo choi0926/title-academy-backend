@@ -99,6 +99,20 @@ const Mutation = {
       return err;
     }
   },
+  async userWithdrawal(parents,args,context){
+    try{
+      await jwtr.destroy(context.AccessTokenVerifyJti, process.env.ACCESS_TOKEN_SECRET);
+      const refreshTokenDecoded = await jwtr.verify(context.user.refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      if (!refreshTokenDecoded) {
+        throw new Error('Invalid token');
+      }
+      await jwtr.destroy(refreshTokenDecoded.jti, process.env.REFRESH_TOKEN_SECRET);
+      await db.User.destroy({where:{email:context.user.email}});
+      return 'You have been successfully withdrawn.';
+    }catch(err){
+      return err;
+    }
+  },
   async addPost(parents, { category, subject, content, files }, context) {
     try {
       const addPost = await db.Post.create({ category, subject, content, UserId: context.user.id });
