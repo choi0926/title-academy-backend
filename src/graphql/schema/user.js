@@ -12,6 +12,11 @@ const user = gql`
     user: User!
     accessToken: String!
     refreshToken: String!
+    expiresIn : String!
+  }
+  type tokenReissue{
+    accessToken: String!
+    expiresIn : String!
   }
 `;
 

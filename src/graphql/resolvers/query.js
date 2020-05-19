@@ -94,7 +94,6 @@ const Query = {
   async searchPost(parents,{searchWord}){
     try{
       const post = await sequelize.query(`SELECT Posts.*,Users.email FROM Posts, Users WHERE Posts.UserId = Users.id AND ((Posts.subject LIKE '%${searchWord}%') OR (Posts.content LIKE '%${searchWord}%')) ORDER BY Posts.id DESC`,{type:QueryTypes.SELECT})
-      console.log(post)
       return post;
     }catch(err){
       return err;

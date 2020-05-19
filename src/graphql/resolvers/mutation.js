@@ -51,6 +51,7 @@ const Mutation = {
         user: users,
         accessToken,
         refreshToken,
+        expiresIn: '15000',
       };
     } catch (err) {
       return err;
@@ -81,7 +82,7 @@ const Mutation = {
       }
       const payload = { email: tokenReissueUser.email };
       const accessTokenReissue = await jwtr.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-      return accessTokenReissue;
+      return { accessToken: accessTokenReissue, expiresIn: '15000' };
     } catch (err) {
       return err;
     }
@@ -93,23 +94,23 @@ const Mutation = {
         throw new Error('The user does not exist.');
       }
       const hashpass = await bcrypt.hash(password, 10);
-      await db.User.update({ password: hashpass,authCode:"" }, { where: { email: user.email } });
+      await db.User.update({ password: hashpass, authCode: '' }, { where: { email: user.email } });
       return 'Your password has been modified.';
     } catch (err) {
       return err;
     }
   },
-  async userWithdrawal(parents,args,context){
-    try{
+  async userWithdrawal(parents, args, context) {
+    try {
       await jwtr.destroy(context.AccessTokenVerifyJti, process.env.ACCESS_TOKEN_SECRET);
       const refreshTokenDecoded = await jwtr.verify(context.user.refreshToken, process.env.REFRESH_TOKEN_SECRET);
       if (!refreshTokenDecoded) {
         throw new Error('Invalid token');
       }
       await jwtr.destroy(refreshTokenDecoded.jti, process.env.REFRESH_TOKEN_SECRET);
-      await db.User.destroy({where:{email:context.user.email}});
+      await db.User.destroy({ where: { email: context.user.email } });
       return 'You have been successfully withdrawn.';
-    }catch(err){
+    } catch (err) {
       return err;
     }
   },
@@ -146,19 +147,19 @@ const Mutation = {
       return err;
     }
   },
-  async postModifed(parents,{PostId, category, subject, content, files},context){
+  async postModifed(parents, { PostId, category, subject, content, files }, context) {
     try {
       const modifiedRight = await db.Post.findOne({
         where: {
           UserId: context.user.id,
-          id:PostId
-        }
-      })
+          id: PostId,
+        },
+      });
       if (!modifiedRight) {
-        throw new Error('You can only modify your own posts.')
+        throw new Error('You can only modify your own posts.');
       }
       //
-      const postModified = await db.Post.update({ category, subject, content },{where: { id: PostId }});
+      const postModified = await db.Post.update({ category, subject, content }, { where: { id: PostId } });
       if (files) {
         files.map(async (ok) => {
           const { createReadStream, filename, mimetype } = await ok;
@@ -172,30 +173,29 @@ const Mutation = {
             ContentType: mimetype,
           };
           const result = await s3.upload(uploadParams).promise();
-          await db.Image.destroy({where:{PostId}});
-          await db.Image.create({ src: result.Location, UserId: context.user.id, PostId});
+          await db.Image.destroy({ where: { PostId } });
+          await db.Image.create({ src: result.Location, UserId: context.user.id, PostId });
           console.log(result);
         });
       }
-      return 'ok'
+      return 'ok';
     } catch (err) {
       return err;
     }
   },
-  async postDeleted(parents,{PostId},context){
-    try{
-      const deletedRight = await db.Post.findOne({where:{UserId:context.user.id,id:PostId}})
-      if(!deletedRight){
+  async postDeleted(parents, { PostId }, context) {
+    try {
+      const deletedRight = await db.Post.findOne({ where: { UserId: context.user.id, id: PostId } });
+      if (!deletedRight) {
         throw new Error('You can delete only your own posts.');
       }
-      await db.Image.destroy({where:{PostId}});
-      await db.Post.destroy({where:{id:PostId}});
+      await db.Image.destroy({ where: { PostId } });
+      await db.Post.destroy({ where: { id: PostId } });
       return 'ok';
-    }catch(err){
+    } catch (err) {
       return err;
-      
     }
-  }
+  },
 };
 
 export default Mutation;

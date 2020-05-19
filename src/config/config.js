@@ -3,7 +3,7 @@ dotenv.config();
 
 module.exports = {
   development: {
-    username: 'root',
+    username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: 'graphql-server',
     host: process.env.DB_HOST,
@@ -12,7 +12,7 @@ module.exports = {
     timezone: "+09:00",
   },
   test: {
-    username: 'root',
+    username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: 'graphql-server',
     host: process.env.DB_HOST,
@@ -21,7 +21,7 @@ module.exports = {
     timezone: "+09:00",
   },
   production: {
-    username: 'root',
+    username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: 'graphql-server',
     host: process.env.DB_HOST,
