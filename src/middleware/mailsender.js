@@ -23,7 +23,7 @@ export const sendMail = async (to, subject, authCode) => {
       subject,
       //TODO:html 문구수정(도메인 주소 수정)
       html: `<p>Please click on the following link</p>
-       <p><a href="http://ec2-15-165-191-71.ap-northeast-2.compute.amazonaws.com/verify?authCode=${authCode}">http://ec2-15-165-191-71.ap-northeast-2.compute.amazonaws.com/verify?authCode=${authCode}</a></p>`,
+       <p><a href="${process.env.FRONT_AUTH_DOMAIN}${authCode}">${process.env.FRONT_AUTH_DOMAIN}${authCode}</a></p>`,
     };
 
   try {
